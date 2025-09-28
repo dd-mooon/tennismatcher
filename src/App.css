@@ -1,0 +1,981 @@
+/* 전체 앱 스타일 */
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 모든 셀렉트 박스 전역 스타일 */
+select {
+  color: #000 !important;
+  padding-right: 2.5rem !important;
+  background-position: right 1rem center !important;
+}
+
+.app-header {
+  text-align: center;
+  padding: 2rem 0;
+  color: white;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app-header p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 섹션 공통 스타일 */
+section {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+section h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+/* 참가자 등록 섹션 */
+.settings-selectors {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.participant-count-selector,
+.rest-count-selector,
+.court-count-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid #e1e5e9;
+}
+
+.participant-count-selector label,
+.rest-count-selector label,
+.court-count-selector label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.participant-count-selector select,
+.rest-count-selector select,
+.court-count-selector select {
+  padding: 1rem 2.5rem 1rem 1rem;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  color: #000;
+  transition: all 0.3s ease;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.2;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.participant-count-selector select:focus,
+.rest-count-selector select:focus,
+.court-count-selector select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.add-participant {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.add-participant input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.8rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.add-participant input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.add-participant select {
+  padding: 1rem 2.5rem 1rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  color: #000;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.2;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.add-participant button {
+  padding: 0.8rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-participant button:hover:not(:disabled) {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+}
+
+.add-participant button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* 참가자 리스트 */
+.participants-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.participant-item:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.gender-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.gender-badge.male {
+  background: #4a90e2;
+}
+
+.gender-badge.female {
+  background: #e24a90;
+}
+
+/* 성별 통계 스타일 */
+.gender-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.male-count {
+  color: #4a90e2;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.female-count {
+  color: #e24a90;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.type-badge {
+  width: 40px;
+  height: 30px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: white;
+}
+
+.type-badge.club {
+  background: #27ae60;
+}
+
+.type-badge.guest {
+  background: #f39c12;
+}
+
+.participant-item .name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.participant-item button {
+  padding: 0.5rem 1rem;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.participant-item button:hover {
+  background: #ff3742;
+  transform: scale(1.05);
+}
+
+/* 클럽멤버 정보 섹션 */
+.club-members-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #e8f5e8;
+  border-radius: 10px;
+  border: 2px solid #27ae60;
+}
+
+.club-members-info h3 {
+  color: #27ae60;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.club-members-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.club-member-item {
+  padding: 0.5rem 1rem;
+  background: #27ae60;
+  color: white;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* 클럽멤버 관리 섹션 */
+.club-member-manager {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid #e1e5e9;
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.manager-header h3 {
+  color: #333;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.toggle-btn {
+  padding: 0.6rem 1.2rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+}
+
+.manager-content {
+  margin-top: 1rem;
+}
+
+/* 새 클럽멤버 등록 섹션 */
+.add-club-member-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+}
+
+.add-club-member-section h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.add-club-member-form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.add-club-member-form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.8rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.add-club-member-form input:focus {
+  outline: none;
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.add-club-member-form select {
+  padding: 0.8rem 2.5rem 0.8rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.2;
+  color: #000;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.add-club-member-form button {
+  padding: 0.8rem 1.5rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-club-member-form button:hover {
+  background: #229954;
+  transform: translateY(-2px);
+}
+
+.saved-members-section h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.saved-members-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.saved-member-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  transition: all 0.3s ease;
+}
+
+.saved-member-item:hover {
+  border-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.saved-member-item .name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.add-btn {
+  padding: 0.4rem 0.8rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.add-btn:hover:not(:disabled) {
+  background: #229954;
+  transform: scale(1.05);
+}
+
+.add-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.remove-btn {
+  padding: 0.4rem 0.8rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+/* 수동 매칭 섹션 */
+.manual-match-inputs {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.manual-match-inputs select {
+  padding: 0.8rem 2.5rem 0.8rem 0.8rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  color: #000;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.manual-match-form {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border: 2px solid #e1e5e9;
+}
+
+.manual-match-form h3 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.match-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.court-select {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.court-select label {
+  font-weight: 500;
+  color: #333;
+}
+
+.court-select select {
+  padding: 1rem 2.5rem 1rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.2;
+  color: #000;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.team-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.team-inputs .team {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+}
+
+.team-inputs .team h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.team-inputs .team select {
+  width: 100%;
+  padding: 1rem 2.5rem 1rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+  appearance: none;
+  min-height: 3rem;
+  line-height: 1.2;
+  color: #000;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+.team-inputs .team select:last-child {
+  margin-bottom: 0;
+}
+
+.remove-manual-match {
+  padding: 0.8rem 1.5rem;
+  background: #ff4757;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.remove-manual-match:hover {
+  background: #ff3742;
+  transform: translateY(-2px);
+}
+
+/* 매칭 생성 버튼 */
+.generate-section {
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.generate-btn {
+  padding: 1.2rem 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 결과 표시 섹션 */
+.round-result {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e1e5e9;
+}
+
+.round-result h3 {
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.match {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #667eea;
+}
+
+.match h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.team {
+  flex: 1;
+  text-align: center;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.vs {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.rest-players {
+  text-align: center;
+}
+
+.rest-players h4 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.rest-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.rest-player {
+  padding: 0.6rem 1.2rem;
+  background: #ffeaa7;
+  color: #2d3436;
+  border-radius: 20px;
+  font-weight: 500;
+  border: 2px solid #fdcb6e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.rest-player-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rest-player-type.club {
+  color: #27ae60;
+}
+
+.rest-player-type.guest {
+  color: #e67e22;
+}
+
+/* 매칭 결과 선수 정보 스타일 */
+.player-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: #000;
+}
+
+/* 대표자 스타일 */
+.player-name.representative {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #000;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  border: 2px solid #ff6b35;
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+}
+
+
+.player-type {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.representative-select {
+  margin: 1rem 0;
+}
+
+.representative-select label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.representative-select select {
+  width: 100%;
+  padding: 0.8rem 2.5rem 0.8rem 0.8rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: white;
+  color: #000;
+  font-size: 1rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.5em 1.5em;
+  min-height: 3rem;
+  line-height: 1.2;
+}
+
+.representative-select select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.player-type.club {
+  color: #27ae60;
+}
+
+.player-type.guest {
+  color: #e67e22;
+}
+
+.team-separator {
+  margin: 0 0.5rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* 코트 타입별 색깔 구분 */
+.match.male-court {
+  border-left: 4px solid #4a90e2;
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(74, 144, 226, 0.05) 100%);
+}
+
+.match.female-court {
+  border-left: 4px solid #e24a90;
+  background: linear-gradient(135deg, rgba(226, 74, 144, 0.1) 0%, rgba(226, 74, 144, 0.05) 100%);
+}
+
+.match.mixed-court {
+  border-left: 4px solid #f39c12;
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0.05) 100%);
+}
+
+.court-type-badge {
+  margin-bottom: 1rem;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+}
+
+.male-court .court-type-badge {
+  background: #4a90e2;
+  color: white;
+}
+
+.female-court .court-type-badge {
+  background: #e24a90;
+  color: white;
+}
+
+.mixed-court .court-type-badge {
+  background: #f39c12;
+  color: white;
+}
+
+/* 잡복 스타일 (어쩔 수 없는 경우) */
+.jabok-court {
+  border-left: 4px solid #e74c3c;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+}
+
+.jabok-court .court-type-badge {
+  background: #e74c3c;
+  color: white;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  .settings-selectors {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .participant-count-selector,
+  .rest-count-selector,
+  .court-count-selector {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .participant-count-selector select,
+  .rest-count-selector select,
+  .court-count-selector select {
+    width: 100%;
+  }
+  
+  .add-participant {
+    flex-direction: column;
+  }
+  
+  .add-participant input,
+  .add-participant select,
+  .add-participant button {
+    width: 100%;
+  }
+  
+  .matches {
+    grid-template-columns: 1fr;
+  }
+  
+  .teams {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .vs {
+    transform: rotate(90deg);
+  }
+  
+  .team-inputs {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .court-select {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .match-inputs {
+    gap: 1rem;
+  }
+  
+  .add-club-member-form {
+    flex-direction: column;
+  }
+  
+  .add-club-member-form input,
+  .add-club-member-form select,
+  .add-club-member-form button {
+    width: 100%;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.round-result {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.participant-item {
+  animation: fadeInUp 0.4s ease-out;
+}
