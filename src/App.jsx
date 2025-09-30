@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { db } from './firebase'
+import { collection, doc, getDocs, addDoc, deleteDoc, updateDoc } from 'firebase/firestore'
+
+// ✅ 단순화된 매칭 설정: 인원별 고정 설정
+const MATCH_SETTINGS = {
+  20: { rest: 4, courts: 4, rounds: 5 },
+  15: { rest: 3, courts: 3, rounds: 5 },
+  10: { rest: 2, courts: 2, rounds: 5 }
+}
 
 function App() {
   const [participants, setParticipants] = useState([])
@@ -13,27 +22,75 @@ function App() {
   const [savedClubMembers, setSavedClubMembers] = useState([])
   const [showClubMemberManager, setShowClubMemberManager] = useState(false)
   const [newClubMember, setNewClubMember] = useState({ name: '', gender: 'male' })
+  
+  // ✅ Python 알고리즘 포팅: 그룹 관리 및 이력 추적
+  const [participantGroups, setParticipantGroups] = useState({}) // 참가자별 그룹 (A/B/guest)
+  const [gameHistory, setGameHistory] = useState({}) // 게임 횟수 추적
+  const [restHistory, setRestHistory] = useState({}) // 휴식 횟수 추적
+  const [mixedHistory, setMixedHistory] = useState({}) // 혼복 참여 이력
 
-  // 컴포넌트 마운트 시 저장된 클럽멤버 불러오기
+  // 컴포넌트 마운트 시 Firebase에서 클럽멤버 불러오기
   useEffect(() => {
-    const saved = localStorage.getItem('tennisClubMembers')
-    if (saved) {
-      setSavedClubMembers(JSON.parse(saved))
+    const loadClubMembers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'clubMembers'))
+        const members = []
+        querySnapshot.forEach((doc) => {
+          members.push({ id: doc.id, ...doc.data() })
+        })
+        setSavedClubMembers(members)
+      } catch (error) {
+        console.error('클럽멤버 불러오기 실패:', error)
+        // Firebase 실패 시 LocalStorage 폴백
+        const saved = localStorage.getItem('tennisClubMembers')
+        if (saved) {
+          setSavedClubMembers(JSON.parse(saved))
+        }
+      }
     }
+    loadClubMembers()
   }, [])
 
   // 클럽멤버 저장
-  const saveClubMember = (member) => {
-    const newSavedMembers = [...savedClubMembers, member]
-    setSavedClubMembers(newSavedMembers)
-    localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+  const saveClubMember = async (member) => {
+    try {
+      const docRef = await addDoc(collection(db, 'clubMembers'), {
+        name: member.name,
+        gender: member.gender,
+        createdAt: new Date()
+      })
+      const newMember = { id: docRef.id, ...member }
+      const newSavedMembers = [...savedClubMembers, newMember]
+      setSavedClubMembers(newSavedMembers)
+      
+      // Firebase 성공 시 LocalStorage도 업데이트 (백업용)
+      localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+    } catch (error) {
+      console.error('클럽멤버 저장 실패:', error)
+      // Firebase 실패 시 LocalStorage만 사용
+      const memberWithId = { id: Date.now(), ...member }
+      const newSavedMembers = [...savedClubMembers, memberWithId]
+      setSavedClubMembers(newSavedMembers)
+      localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+    }
   }
 
   // 클럽멤버 삭제
-  const removeSavedClubMember = (id) => {
-    const newSavedMembers = savedClubMembers.filter(m => m.id !== id)
-    setSavedClubMembers(newSavedMembers)
-    localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+  const removeSavedClubMember = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'clubMembers', id))
+      const newSavedMembers = savedClubMembers.filter(m => m.id !== id)
+      setSavedClubMembers(newSavedMembers)
+      
+      // Firebase 성공 시 LocalStorage도 업데이트 (백업용)
+      localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+    } catch (error) {
+      console.error('클럽멤버 삭제 실패:', error)
+      // Firebase 실패 시 LocalStorage만 사용
+      const newSavedMembers = savedClubMembers.filter(m => m.id !== id)
+      setSavedClubMembers(newSavedMembers)
+      localStorage.setItem('tennisClubMembers', JSON.stringify(newSavedMembers))
+    }
   }
 
   // 저장된 클럽멤버를 현재 참가자에 추가
@@ -46,10 +103,9 @@ function App() {
   }
 
   // 클럽멤버 직접 등록
-  const addNewClubMember = () => {
+  const addNewClubMember = async () => {
     if (newClubMember.name.trim()) {
       const member = {
-        id: Date.now(),
         name: newClubMember.name.trim(),
         gender: newClubMember.gender
       }
@@ -57,7 +113,7 @@ function App() {
       // 중복 체크
       const isDuplicate = savedClubMembers.some(m => m.name === member.name)
       if (!isDuplicate) {
-        saveClubMember(member)
+        await saveClubMember(member)
         setNewClubMember({ name: '', gender: 'male' })
       } else {
         alert('이미 등록된 클럽멤버입니다.')
@@ -66,7 +122,7 @@ function App() {
   }
 
   // 참가자 추가
-  const addParticipant = () => {
+  const addParticipant = async () => {
     if (newParticipant.name.trim() && participants.length < totalParticipants) {
       const participant = { 
         id: Date.now(), 
@@ -77,18 +133,32 @@ function App() {
       
       setParticipants([...participants, participant])
       
+      // ✅ 그룹 할당 (클럽멤버는 A그룹 기본, 게스트는 guest)
+      setParticipantGroups(prev => ({
+        ...prev,
+        [participant.id]: newParticipant.type === 'club' ? 'A' : 'guest'
+      }))
+      
       // 클럽멤버인 경우 클럽멤버 리스트에도 추가하고 저장
       if (newParticipant.type === 'club') {
         setClubMembers([...clubMembers, participant])
         // 중복 체크 후 저장
         const isDuplicate = savedClubMembers.some(m => m.name === participant.name)
         if (!isDuplicate) {
-          saveClubMember({ name: participant.name, gender: participant.gender })
+          await saveClubMember({ name: participant.name, gender: participant.gender })
         }
       }
       
       setNewParticipant({ name: '', gender: 'male', type: 'guest' })
     }
+  }
+
+  // ✅ 참가자 그룹 변경
+  const changeParticipantGroup = (participantId, newGroup) => {
+    setParticipantGroups(prev => ({
+      ...prev,
+      [participantId]: newGroup
+    }))
   }
 
   // 참가자 삭제
@@ -102,269 +172,318 @@ function App() {
     }
   }
 
-  // 매칭 로직
+  // ✅ Python 포팅: Cross-pair swap 잡복 방지 로직
+  const swapIfNeeded = (previousRound, currentRound, maxAttempts = 20) => {
+    let attempt = 0
+    let swapWarning = false
+    
+    while (attempt < maxAttempts) {
+      let needRetry = false
+      
+      for (const prevMatch of previousRound) {
+        for (const currMatch of currentRound) {
+          const prevPlayers = [...prevMatch.team1, ...prevMatch.team2]
+          const currPlayers = [...currMatch.team1, ...currMatch.team2]
+          const commonPlayers = prevPlayers.filter(p1 => 
+            currPlayers.some(p2 => p1.id === p2.id)
+          )
+          
+          if (commonPlayers.length >= 3 && currPlayers.length >= 4) {
+            // Cross-pair swap: p1,p2,p3,p4 → p1,p3,p2,p4
+            const temp = currMatch.team1[1]
+            currMatch.team1[1] = currMatch.team2[0]
+            currMatch.team2[0] = temp
+            needRetry = true
+          }
+        }
+      }
+      
+      if (!needRetry) break
+      attempt++
+    }
+    
+    if (attempt >= maxAttempts) {
+      swapWarning = true
+    }
+    
+    return [currentRound, swapWarning]
+  }
+
+  // ✅ 단순화된 동적 매칭 알고리즘
   const generateMatches = () => {
-    console.log('=== 매칭 생성 시작 ===')
-    console.log('참가자 수:', participants.length)
-    console.log('설정된 총 참가자 수:', totalParticipants)
-    console.log('휴식자 수:', restPlayersPerRound)
-    console.log('최대 코트 수:', maxCourts)
-    console.log('수동매칭:', manualMatches)
+    console.log('=== 동적 매칭 알고리즘 시작 ===')
     
     if (participants.length !== totalParticipants) {
       alert(`정확히 ${totalParticipants}명의 참가자가 필요합니다. 현재 ${participants.length}명입니다.`)
       return
     }
 
-    console.log('참가자 정보:', participants)
+    // ✅ 지원되는 인원만 허용
+    if (![10, 15, 20].includes(totalParticipants)) {
+      alert('10명, 15명, 20명만 지원됩니다.')
+      return
+    }
 
-    const results = []
-    const usedPairs = new Set()
-    const usedRestPlayers = new Set() // 휴식자 중복 방지
+    const malePlayers = participants.filter(p => p.gender === 'male')
+    const femalePlayers = participants.filter(p => p.gender === 'female')
+    const numMale = malePlayers.length
+    const numFemale = femalePlayers.length
+    const settings = MATCH_SETTINGS[totalParticipants]
     
-    for (let round = 1; round <= 5; round++) {
+    console.log(`참가자: 남 ${numMale}, 여 ${numFemale}`)
+    console.log('매칭 설정:', settings)
+
+    // ✅ 남녀 비율 분석 및 매칭 전략 결정
+    const genderDiff = Math.abs(numMale - numFemale)
+    const isGenderBalanced = genderDiff <= 2 // 차이 2명 이하면 균등
+    
+    console.log(`남녀 차이: ${genderDiff}명, 균등 여부: ${isGenderBalanced}`)
+    
+    // ✅ 그룹 정보 및 이력 초기화
+    const groupDict = {}
+    participants.forEach(p => {
+      groupDict[p.id] = participantGroups[p.id] || (p.type === 'guest' ? 'guest' : 'A')
+    })
+    
+    const restCount = {}
+    const gameCount = {}
+    const mixedPlayed = {}
+    
+    participants.forEach(p => {
+      restCount[p.id] = 0
+      gameCount[p.id] = 0
+      mixedPlayed[p.id] = 0
+    })
+    
+    const results = []
+    let previousRound = []
+    
+    // ✅ 5라운드 단순 반복 매칭
+    for (let round = 1; round <= settings.rounds; round++) {
       console.log(`\n--- 라운드 ${round} 시작 ---`)
-      const roundMatches = []
-      const availableParticipants = [...participants]
-      console.log('라운드 시작 시 참가자 수:', availableParticipants.length)
       
-      // 수동 매칭이 있는 경우 먼저 적용
-      if (manualMatches[round]) {
-        const manualMatch = manualMatches[round]
-        const player1 = participants.find(p => p.name === manualMatch.player1)
-        const player2 = participants.find(p => p.name === manualMatch.player2)
-        const player3 = participants.find(p => p.name === manualMatch.player3)
-        const player4 = participants.find(p => p.name === manualMatch.player4)
-        
-        console.log(`라운드 ${round} 수동 매칭:`, { 
-          manualMatch,
-          player1, 
-          player2, 
-          player3, 
-          player4,
-          participants: participants.map(p => ({ name: p.name, type: p.type })),
-          representative: manualMatch.representative
-        })
-        
-        if (player1 && player2 && player3 && player4) {
-          // 수동매칭에서 선택된 대표자 찾기 (선수들 중에서 찾기)
-          const representativePlayer = manualMatch.representative 
-            ? [player1, player2, player3, player4].find(p => p.name === manualMatch.representative)
-            : null
-          
-          console.log(`수동매칭 대표자 찾기:`, {
-            selectedRepresentative: manualMatch.representative,
-            foundRepresentative: representativePlayer,
-            players: [player1, player2, player3, player4].map(p => ({ name: p.name, type: p.type }))
-          })
-          
-          const match = {
-            court: manualMatch.court,
-            team1: [player1, player2],
-            team2: [player3, player4],
-            representative: representativePlayer
-          }
-          roundMatches.push(match)
-          
-          // 수동 매칭에 사용된 선수들을 제거
-          const usedPlayers = [player1, player2, player3, player4]
-          usedPlayers.forEach(player => {
-            const index = availableParticipants.findIndex(p => p.id === player.id)
-            if (index !== -1) availableParticipants.splice(index, 1)
-          })
-        }
+      // ✅ 휴식자 선정 (성별 균형 고려 + 휴식 횟수 우선)
+      const maleCandidates = malePlayers.sort((a, b) => restCount[a.id] - restCount[b.id])
+      const femaleCandidates = femalePlayers.sort((a, b) => restCount[a.id] - restCount[b.id])
+      
+      // 휴식자를 성별 균형있게 선택
+      const restMaleCount = Math.floor(settings.rest / 2)
+      const restFemaleCount = settings.rest - restMaleCount
+      
+      const restMales = maleCandidates.slice(0, Math.min(restMaleCount, maleCandidates.length))
+      const restFemales = femaleCandidates.slice(0, Math.min(restFemaleCount, femaleCandidates.length))
+      
+      // 부족한 휴식자가 있으면 다른 성별에서 충당
+      let restThisRound = [...restMales, ...restFemales]
+      
+      if (restThisRound.length < settings.rest) {
+        const remaining = settings.rest - restThisRound.length
+        const otherCandidates = participants
+          .filter(p => !restThisRound.includes(p))
+          .sort((a, b) => restCount[a.id] - restCount[b.id])
+        restThisRound = [...restThisRound, ...otherCandidates.slice(0, remaining)]
       }
-
-      // 나머지 매칭 자동 생성 - 동적 코트 수 계산
-      const playersPerCourt = 4
-      const availablePlayers = availableParticipants.length
-      const restCount = Math.min(restPlayersPerRound, availablePlayers)
-      const playingPlayers = availablePlayers - restCount
-      const calculatedMaxCourts = Math.floor(playingPlayers / playersPerCourt)
-      // 수동매칭이 있는 경우 해당 코트 번호를 제외하고 계산
-      const usedCourts = roundMatches.map(m => m.court)
-      const availableCourtNumbers = Array.from({length: maxCourts}, (_, i) => i + 1)
-        .filter(courtNum => !usedCourts.includes(courtNum))
-      const actualCourts = Math.min(calculatedMaxCourts, Math.max(availableCourtNumbers.length, 1))
       
-      let restPlayers = []
+      const activePlayers = participants.filter(p => !restThisRound.includes(p))
       
-      if (availablePlayers >= playersPerCourt) {
-        // 휴식자 선택 (중복 방지)
-        const availableForRest = availableParticipants.filter(p => !usedRestPlayers.has(p.id))
-        for (let i = 0; i < restCount && i < availableForRest.length; i++) {
-          const randomIndex = Math.floor(Math.random() * availableForRest.length)
-          const selectedPlayer = availableForRest.splice(randomIndex, 1)[0]
-          restPlayers.push(selectedPlayer)
-          usedRestPlayers.add(selectedPlayer.id)
-          
-          // availableParticipants에서도 제거
-          const index = availableParticipants.findIndex(p => p.id === selectedPlayer.id)
-          if (index !== -1) availableParticipants.splice(index, 1)
+      console.log(`휴식자 성별 구성: 남 ${restThisRound.filter(p => p.gender === 'male').length}, 여 ${restThisRound.filter(p => p.gender === 'female').length}`)
+      
+      // 휴식자 카운트 증가
+      restThisRound.forEach(p => { restCount[p.id] = restCount[p.id] + 1 })
+      
+      const activeMen = activePlayers.filter(p => p.gender === 'male')
+      const activeWomen = activePlayers.filter(p => p.gender === 'female')
+      
+      console.log(`활동 인원: 남 ${activeMen.length}, 여 ${activeWomen.length}`)
+      console.log(`휴식자: ${restThisRound.map(p => p.name).join(', ')}`)
+      console.log(`코트 설정: ${settings.courts}코트, 필요 인원: ${settings.courts * 4}명, 실제 활동 인원: ${activePlayers.length}명`)
+      
+      // ✅ 동적 매칭 전략 결정 + 클럽멤버 우선 배치
+      const matchList = []
+      
+      // 클럽멤버와 게스트 분리 (성별별로)
+      const activeMenClub = activeMen.filter(p => p.type === 'club').sort((a, b) => gameCount[a.id] - gameCount[b.id])
+      const activeMenGuest = activeMen.filter(p => p.type === 'guest').sort((a, b) => gameCount[a.id] - gameCount[b.id])
+      const activeWomenClub = activeWomen.filter(p => p.type === 'club').sort((a, b) => gameCount[a.id] - gameCount[b.id])
+      const activeWomenGuest = activeWomen.filter(p => p.type === 'guest').sort((a, b) => gameCount[a.id] - gameCount[b.id])
+      
+      // 클럽멤버 우선 배치를 위해 섞어서 정렬
+      let remainingMen = [...activeMenClub, ...activeMenGuest]
+      let remainingWomen = [...activeWomenClub, ...activeWomenGuest]
+      
+      console.log(`클럽멤버 분포: 남자 클럽 ${activeMenClub.length}, 여자 클럽 ${activeWomenClub.length}`)
+      
+      // 총 코트 수만큼 매칭 생성  
+      for (let court = 1; court <= settings.courts; court++) {
+        // 각 코트마다 4명이 필요하므로 남은 인원이 4명 미만이면 해당 코트는 스킵
+        if (remainingMen.length + remainingWomen.length < 4) {
+          console.log(`코트 ${court}: 인원 부족 (남 ${remainingMen.length}, 여 ${remainingWomen.length})`)
+          break
         }
+        
+        let team1 = [], team2 = []
+        
+        // ✅ 매칭 전략: 여복/남복/혼복을 적당히 섞어서 배치
+        // 코트별로 다양한 매칭 타입 생성 (라운드와 코트 번호 기준으로 패턴 생성)
+        const matchPattern = (round === 1) ? 0 : (round + court) % 3 // 1라운드에서는 여복/남복 우선
 
-        // 남은 선수들로 매칭 생성 (남녀 비율 고려)
-        const shuffledPlayers = [...availableParticipants].sort(() => Math.random() - 0.5)
-        const malePlayers = shuffledPlayers.filter(p => p.gender === 'male')
-        const femalePlayers = shuffledPlayers.filter(p => p.gender === 'female')
-        
-        console.log(`라운드 ${round} 매칭:`, {
-          totalPlayers: shuffledPlayers.length,
-          maleCount: malePlayers.length,
-          femaleCount: femalePlayers.length,
-          actualCourts
-        })
-        
-        // 모든 코트를 최대한 활용하는 매칭 로직
-        let courtIndex = 0
-        
-        // 가능한 모든 매칭 타입 계산
-        const femaleCourts = Math.floor(femalePlayers.length / 4)
-        const maleCourts = Math.floor(malePlayers.length / 4)
-        const mixedCourts = Math.min(Math.floor(malePlayers.length / 2), Math.floor(femalePlayers.length / 2))
-        
-        const totalPossibleCourts = femaleCourts + maleCourts + mixedCourts
-        const maxCourtsToUse = Math.min(totalPossibleCourts, actualCourts, availableCourtNumbers.length)
-        
-        console.log(`매칭 계획:`, {
-          femaleCourts,
-          maleCourts, 
-          mixedCourts,
-          totalPossibleCourts,
-          maxCourtsToUse,
-          actualCourts,
-          availableCourtNumbers,
-          usedCourts
-        })
-        
-        // 1단계: 여복 매칭 (여자 4명씩)
-        for (let i = 0; i < femaleCourts && courtIndex < maxCourtsToUse; i++) {
-          const team1 = [femalePlayers[0], femalePlayers[1]]
-          const team2 = [femalePlayers[2], femalePlayers[3]]
-          femalePlayers.splice(0, 4)
-          
-          const match = {
-            court: availableCourtNumbers[courtIndex],
-            team1,
-            team2,
-            representative: null
-          }
-          
-          console.log(`코트 ${match.court} 매칭 (여복):`, {
-            team1: team1.map(p => `${p.name}(${p.gender},${p.type})`),
-            team2: team2.map(p => `${p.name}(${p.gender},${p.type})`),
-            courtType: 'female-court',
-            courtTypeText: '여복'
-          })
-          
-          roundMatches.push(match)
-          courtIndex++
+        if (matchPattern === 0 && remainingWomen.length >= 4) {
+          // 패턴 0: 여복 우선
+          console.log(`코트 ${court}: 여복 매칭 (패턴)`)
+          team1 = [remainingWomen.shift(), remainingWomen.shift()]
+          team2 = [remainingWomen.shift(), remainingWomen.shift()]
+        }
+        else if (matchPattern === 1 && remainingMen.length >= 4) {
+          // 패턴 1: 남복 우선
+          console.log(`코트 ${court}: 남복 매칭 (패턴)`)
+          team1 = [remainingMen.shift(), remainingMen.shift()]
+          team2 = [remainingMen.shift(), remainingMen.shift()]
+        }
+        else if (matchPattern === 2 && remainingMen.length >= 2 && remainingWomen.length >= 2) {
+          // 패턴 2: 혼복 우선
+          console.log(`코트 ${court}: 혼복 매칭 (패턴)`)
+          team1 = [remainingMen.shift(), remainingWomen.shift()]
+          team2 = [remainingMen.shift(), remainingWomen.shift()]
+          // 혼복 이력 기록
+          team1.forEach(p => { mixedPlayed[p.id] = mixedPlayed[p.id] + 1 })
+          team2.forEach(p => { mixedPlayed[p.id] = mixedPlayed[p.id] + 1 })
+        }
+        // 패턴 매칭이 안되면 가능한 것 중에서 선택 (폴백)
+        else if (remainingWomen.length >= 4) {
+          console.log(`코트 ${court}: 여복 매칭 (폴백)`)
+          team1 = [remainingWomen.shift(), remainingWomen.shift()]
+          team2 = [remainingWomen.shift(), remainingWomen.shift()]
+        }
+        else if (remainingMen.length >= 4) {
+          console.log(`코트 ${court}: 남복 매칭 (폴백)`)
+          team1 = [remainingMen.shift(), remainingMen.shift()]
+          team2 = [remainingMen.shift(), remainingMen.shift()]
+        }
+        else if (remainingMen.length >= 2 && remainingWomen.length >= 2) {
+          console.log(`코트 ${court}: 혼복 매칭 (폴백)`)
+          team1 = [remainingMen.shift(), remainingWomen.shift()]
+          team2 = [remainingMen.shift(), remainingWomen.shift()]
+          // 혼복 이력 기록
+          team1.forEach(p => { mixedPlayed[p.id] = mixedPlayed[p.id] + 1 })
+          team2.forEach(p => { mixedPlayed[p.id] = mixedPlayed[p.id] + 1 })
         }
         
-        // 2단계: 남복 매칭 (남자 4명씩)
-        for (let i = 0; i < maleCourts && courtIndex < maxCourtsToUse; i++) {
-          const team1 = [malePlayers[0], malePlayers[1]]
-          const team2 = [malePlayers[2], malePlayers[3]]
-          malePlayers.splice(0, 4)
+        if (team1.length === 2 && team2.length === 2) {
+          // ✅ 각 코트마다 클럽멤버 최소 1명 보장
+          const allMatchPlayers = [...team1, ...team2]
+          const clubMembersInMatch = allMatchPlayers.filter(p => p.type === 'club')
           
-          const match = {
-            court: availableCourtNumbers[courtIndex],
-            team1,
-            team2,
-            representative: null
-          }
-          
-          console.log(`코트 ${match.court} 매칭 (남복):`, {
-            team1: team1.map(p => `${p.name}(${p.gender},${p.type})`),
-            team2: team2.map(p => `${p.name}(${p.gender},${p.type})`),
-            courtType: 'male-court',
-            courtTypeText: '남복'
-          })
-          
-          roundMatches.push(match)
-          courtIndex++
-        }
-        
-        // 3단계: 혼복 매칭 (남자 2명, 여자 2명)
-        for (let i = 0; i < mixedCourts && courtIndex < maxCourtsToUse; i++) {
-          const team1 = [malePlayers[0], femalePlayers[0]]
-          const team2 = [malePlayers[1], femalePlayers[1]]
-          malePlayers.splice(0, 2)
-          femalePlayers.splice(0, 2)
-          
-          const match = {
-            court: availableCourtNumbers[courtIndex],
-            team1,
-            team2,
-            representative: null
-          }
-          
-          console.log(`코트 ${match.court} 매칭 (혼복):`, {
-            team1: team1.map(p => `${p.name}(${p.gender},${p.type})`),
-            team2: team2.map(p => `${p.name}(${p.gender},${p.type})`),
-            courtType: 'mixed-court',
-            courtTypeText: '혼복'
-          })
-          
-          roundMatches.push(match)
-          courtIndex++
-        }
-        
-        // 각 매칭에 대표자 선택 및 클럽멤버 배치
-        roundMatches.forEach(match => {
-          let team1 = [...match.team1]
-          let team2 = [...match.team2]
-          
-          // 클럽멤버 배치 확인 및 조정
-          const team1ClubCount = team1.filter(p => p.type === 'club').length
-          const team2ClubCount = team2.filter(p => p.type === 'club').length
-          
-          if (team1ClubCount === 0 && team2ClubCount > 1) {
-            const clubMember = team2.find(p => p.type === 'club')
-            const guestMember = team1.find(p => p.type === 'guest')
-            if (clubMember && guestMember) {
-              team1 = team1.map(p => p.id === guestMember.id ? clubMember : p)
-              team2 = team2.map(p => p.id === clubMember.id ? guestMember : p)
+          // 클럽멤버가 없으면 남은 인원에서 클럽멤버 찾아서 교체
+          if (clubMembersInMatch.length === 0) {
+            console.log(`⚠️ 코트 ${court}: 클럽멤버 없음, 교체 필요`)
+            
+            // 남은 인원 중에서 클럽멤버 찾기
+            const availableClubMen = remainingMen.filter(p => p.type === 'club')
+            const availableClubWomen = remainingWomen.filter(p => p.type === 'club')
+            
+            // 교체 시도 (같은 성별끼리만 교체)
+            if (availableClubMen.length > 0 && (team1.some(p => p.gender === 'male') || team2.some(p => p.gender === 'male'))) {
+              // 남자 게스트와 클럽멤버 교체
+              const guestMale = allMatchPlayers.find(p => p.gender === 'male' && p.type === 'guest')
+              if (guestMale) {
+                const clubMale = availableClubMen.shift()
+                
+                // 팀에서 교체
+                if (team1.includes(guestMale)) {
+                  team1[team1.indexOf(guestMale)] = clubMale
+                } else {
+                  team2[team2.indexOf(guestMale)] = clubMale
+                }
+                
+                // 남은 인원 목록에서 제거하고 추가
+                remainingMen = remainingMen.filter(p => p.id !== clubMale.id)
+                remainingMen.push(guestMale)
+                console.log(`✅ 남자 교체: ${guestMale.name}(게스트) ↔ ${clubMale.name}(클럽)`)
+              }
             }
-          } else if (team2ClubCount === 0 && team1ClubCount > 1) {
-            const clubMember = team1.find(p => p.type === 'club')
-            const guestMember = team2.find(p => p.type === 'guest')
-            if (clubMember && guestMember) {
-              team2 = team2.map(p => p.id === guestMember.id ? clubMember : p)
-              team1 = team1.map(p => p.id === clubMember.id ? guestMember : p)
+            else if (availableClubWomen.length > 0 && (team1.some(p => p.gender === 'female') || team2.some(p => p.gender === 'female'))) {
+              // 여자 게스트와 클럽멤버 교체
+              const guestFemale = allMatchPlayers.find(p => p.gender === 'female' && p.type === 'guest')
+              if (guestFemale) {
+                const clubFemale = availableClubWomen.shift()
+                
+                // 팀에서 교체
+                if (team1.includes(guestFemale)) {
+                  team1[team1.indexOf(guestFemale)] = clubFemale
+                } else {
+                  team2[team2.indexOf(guestFemale)] = clubFemale
+                }
+                
+                // 남은 인원 목록에서 제거하고 추가
+                remainingWomen = remainingWomen.filter(p => p.id !== clubFemale.id)
+                remainingWomen.push(guestFemale)
+                console.log(`✅ 여자 교체: ${guestFemale.name}(게스트) ↔ ${clubFemale.name}(클럽)`)
+              }
             }
           }
           
-          // 각 코트별로 클럽멤버 대표자 선택 (랜덤)
-          const courtClubMembers = [...team1, ...team2].filter(p => p.type === 'club')
-          const courtRepresentative = courtClubMembers.length > 0 
-            ? courtClubMembers[Math.floor(Math.random() * courtClubMembers.length)]
+          // 게임 횟수 증가
+          team1.forEach(p => { gameCount[p.id] = gameCount[p.id] + 1 })
+          team2.forEach(p => { gameCount[p.id] = gameCount[p.id] + 1 })
+          
+          // 대표자 선정 (클럽멤버 중 랜덤)
+          const finalAllPlayers = [...team1, ...team2]
+          const finalClubMembers = finalAllPlayers.filter(p => p.type === 'club')
+          const representative = finalClubMembers.length > 0 
+            ? finalClubMembers[Math.floor(Math.random() * finalClubMembers.length)]
             : null
           
-          // 매칭 업데이트
-          match.team1 = team1
-          match.team2 = team2
-          match.representative = courtRepresentative
-        })
+          console.log(`코트 ${court} 구성: 클럽 ${finalClubMembers.length}명, 게스트 ${4 - finalClubMembers.length}명`)
+          
+          matchList.push({
+            type: 'match',
+            team1,
+            team2,
+            court,
+            representative
+          })
+        }
       }
-
-      console.log(`라운드 ${round} 완료:`, {
-        matchCount: roundMatches.length,
-        restPlayers: restPlayers.length,
-        matches: roundMatches.map(m => ({ court: m.court, team1: m.team1.map(p => p.name), team2: m.team2.map(p => p.name) }))
-      })
+      
+      // ✅ Cross-pair swap 적용
+      const [swappedMatches, swapWarning] = swapIfNeeded(previousRound, matchList)
+      
+      // ✅ 라운드 결과 저장
+      const roundMatches = swappedMatches.map(match => ({
+        court: match.court,
+        team1: match.team1,
+        team2: match.team2,
+        representative: match.representative
+      }))
       
       results.push({
         round,
         matches: roundMatches,
-        restPlayers: restPlayers
+        restPlayers: restThisRound
       })
+      
+      previousRound = matchList
+      
+      console.log(`라운드 ${round} 완료: ${roundMatches.length}경기/${settings.courts}코트 (사용률: ${Math.round(roundMatches.length/settings.courts*100)}%), 휴식 ${restThisRound.length}명`)
+      
+      // ✅ 코트 사용률 체크
+      if (roundMatches.length < settings.courts) {
+        console.warn(`⚠️ 코트 미사용 발생! ${settings.courts}코트 중 ${roundMatches.length}코트만 사용`)
+        console.log('매칭 완료 시점 잔여 인원:', {
+          men: remainingMen.length,
+          women: remainingWomen.length,
+          total: remainingMen.length + remainingWomen.length
+        })
+      }
     }
-
-    console.log('\n=== 최종 매칭 결과 ===')
-    console.log('총 라운드 수:', results.length)
-    console.log('전체 매칭 결과:', results)
+    
+    console.log('✅ 매칭 생성 완료')
     setMatchingResults(results)
+    
+    // 이력 저장
+    setGameHistory(gameCount)
+    setRestHistory(restCount)
+    setMixedHistory(mixedPlayed)
   }
 
   // 수동 매칭 설정
@@ -419,7 +538,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>🎾 테니스 페어 매칭 시스템</h1>
-        <p>{totalParticipants}명 기준, 최대 {maxCourts}코트, 5라운드 매칭 (라운드당 휴식 {restPlayersPerRound}명)</p>
+        <p>{totalParticipants}명 기준 • {maxCourts}코트 • 5라운드 • 휴식 {restPlayersPerRound}명 (남녀 비율 기반 동적 매칭)</p>
       </header>
 
       <div className="main-content">
@@ -439,55 +558,39 @@ function App() {
                 onChange={(e) => {
                   const newCount = parseInt(e.target.value)
                   setTotalParticipants(newCount)
+                  
                   // 참가자 수가 줄어들면 초과하는 참가자들 제거
                   if (participants.length > newCount) {
                     setParticipants(participants.slice(0, newCount))
                   }
-                  // 휴식자 수는 최대 4명으로 제한 (참가자 수와 무관)
-                  if (restPlayersPerRound > 4) {
+                  
+                  // ✅ 인원별 휴식자 수와 코트 수 자동 설정
+                  if (newCount === 20) {
                     setRestPlayersPerRound(4)
+                    setMaxCourts(4)
+                  } else if (newCount === 15) {
+                    setRestPlayersPerRound(3)
+                    setMaxCourts(3)
+                  } else if (newCount === 10) {
+                    setRestPlayersPerRound(2)
+                    setMaxCourts(2)
                   }
                 }}
               >
                 <option value={20}>20명</option>
-                <option value={18}>18명</option>
-                <option value={16}>16명</option>
-                <option value={14}>14명</option>
-                <option value={12}>12명</option>
+                <option value={15}>15명</option>
                 <option value={10}>10명</option>
-                <option value={8}>8명</option>
               </select>
             </div>
             
-            <div className="rest-count-selector">
+            <div className="rest-count-display">
               <label>라운드당 휴식자 수:</label>
-              <select 
-                value={restPlayersPerRound} 
-                onChange={(e) => {
-                  const newRestCount = Math.min(4, parseInt(e.target.value))
-                  setRestPlayersPerRound(newRestCount)
-                }}
-              >
-                {Array.from({length: 5}, (_, i) => (
-                  <option key={i} value={i}>{i}명</option>
-                ))}
-              </select>
+              <span className="auto-setting">{restPlayersPerRound}명 (자동 설정)</span>
             </div>
             
-            <div className="court-count-selector">
-              <label>최대 코트 수:</label>
-              <select 
-                value={maxCourts} 
-                onChange={(e) => {
-                  const newCourtCount = parseInt(e.target.value)
-                  setMaxCourts(newCourtCount)
-                }}
-              >
-                <option value={1}>1코트</option>
-                <option value={2}>2코트</option>
-                <option value={3}>3코트</option>
-                <option value={4}>4코트</option>
-              </select>
+            <div className="court-count-display">
+              <label>코트 수:</label>
+              <span className="auto-setting">{maxCourts}코트 (자동 설정)</span>
             </div>
           </div>
           
@@ -528,6 +631,22 @@ function App() {
                   {participant.type === 'club' ? '클럽' : '게스트'}
                 </span>
                 <span className="name">{participant.name} ({participant.gender === 'male' ? '남' : '여'})</span>
+                
+                {/* ✅ 그룹 선택 기능 추가 */}
+                {participant.type === 'club' && (
+                  <select 
+                    value={participantGroups[participant.id] || 'A'} 
+                    onChange={(e) => changeParticipantGroup(participant.id, e.target.value)}
+                    className="group-select"
+                  >
+                    <option value="A">A그룹</option>
+                    <option value="B">B그룹</option>
+                  </select>
+                )}
+                {participant.type === 'guest' && (
+                  <span className="guest-group-badge">게스트</span>
+                )}
+                
                 <button onClick={() => removeParticipant(participant.id)}>삭제</button>
               </div>
             ))}
@@ -795,7 +914,59 @@ function App() {
         {/* 결과 표시 섹션 */}
         {matchingResults && (
           <section className="results-section">
-            <h2>매칭 결과</h2>
+            <h2>🎾 매칭 결과</h2>
+            
+            {/* ✅ 매칭 통계 정보 */}
+            <div className="matching-stats">
+              <h3>📊 매칭 통계</h3>
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <span className="stat-label">총 참가자</span>
+                  <span className="stat-value">{participants.length}명</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">남녀 비율</span>
+                  <span className="stat-value">
+                    남 {participants.filter(p => p.gender === 'male').length} : 
+                    여 {participants.filter(p => p.gender === 'female').length}
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">클럽 vs 게스트</span>
+                  <span className="stat-value">
+                    클럽 {participants.filter(p => p.type === 'club').length} : 
+                    게스트 {participants.filter(p => p.type === 'guest').length}
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">총 라운드</span>
+                  <span className="stat-value">{matchingResults.length}라운드</span>
+                </div>
+                
+                {/* 매칭 타입별 통계 */}
+                <div className="match-type-stats">
+                  {(() => {
+                    const typeStats = { mixed: 0, men: 0, women: 0 }
+                    matchingResults.forEach(round => {
+                      round.matches.forEach(match => {
+                        const courtType = getCourtTypeText(match)
+                        if (courtType === '혼복') typeStats.mixed++
+                        else if (courtType === '남복') typeStats.men++
+                        else if (courtType === '여복') typeStats.women++
+                      })
+                    })
+                    return (
+                      <div className="type-breakdown">
+                        <span className="stat-label">매칭 타입</span>
+                        <span className="stat-value">
+                          혼복 {typeStats.mixed} | 남복 {typeStats.men} | 여복 {typeStats.women}
+                        </span>
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
+            </div>
             {matchingResults.map((roundData) => (
               <div key={roundData.round} className="round-result">
                 <h3>라운드 {roundData.round}</h3>

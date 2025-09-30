@@ -65,8 +65,8 @@ section h2 {
 }
 
 .participant-count-selector,
-.rest-count-selector,
-.court-count-selector {
+.rest-count-display,
+.court-count-display {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -77,16 +77,26 @@ section h2 {
 }
 
 .participant-count-selector label,
-.rest-count-selector label,
-.court-count-selector label {
+.rest-count-display label,
+.court-count-display label {
   font-weight: 600;
   color: #333;
   font-size: 1.1rem;
 }
 
-.participant-count-selector select,
-.rest-count-selector select,
-.court-count-selector select {
+.auto-setting {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+  border: 2px solid #1e7e34;
+}
+
+.participant-count-selector select {
   padding: 1rem 2.5rem 1rem 1rem;
   border: 2px solid #667eea;
   border-radius: 8px;
@@ -105,9 +115,7 @@ section h2 {
   background-size: 1rem;
 }
 
-.participant-count-selector select:focus,
-.rest-count-selector select:focus,
-.court-count-selector select:focus {
+.participant-count-selector select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -900,15 +908,13 @@ section h2 {
   }
   
   .participant-count-selector,
-  .rest-count-selector,
-  .court-count-selector {
+  .rest-count-display,
+  .court-count-display {
     flex-direction: column;
     align-items: flex-start;
   }
   
-  .participant-count-selector select,
-  .rest-count-selector select,
-  .court-count-selector select {
+  .participant-count-selector select {
     width: 100%;
   }
   
@@ -978,4 +984,157 @@ section h2 {
 
 .participant-item {
   animation: fadeInUp 0.4s ease-out;
+}
+
+/* ✅ Python 알고리즘 기반 새 기능 스타일 */
+.group-select {
+  margin-left: 8px;
+  padding: 4px 12px;
+  border: 2px solid #667eea;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #f0f4ff;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 70px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 12px;
+  padding-right: 28px;
+}
+
+.group-select:hover {
+  background: #e6efff;
+  border-color: #5a6fd8;
+}
+
+.guest-group-badge {
+  margin-left: 8px;
+  padding: 4px 12px;
+  background: #6c757d;
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 60px;
+  text-align: center;
+}
+
+.matching-stats {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+}
+
+.matching-stats h3 {
+  margin: 0 0 20px 0;
+  color: #667eea;
+  font-size: 1.4rem;
+  text-align: center;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1rem;
+  font-family: 'Segoe UI', monospace;
+}
+
+.match-type-stats {
+  grid-column: 1 / -1;
+}
+
+.type-breakdown {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #28a745;
+  box-shadow: 0 3px 8px rgba(40, 167, 69, 0.1);
+}
+
+.type-breakdown .stat-value {
+  color: #28a745;
+  font-family: 'Segoe UI', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* 개선된 participant-item 스타일 */
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.participant-item:hover {
+  border-color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.participant-item .name {
+  flex: 1;
+  margin-left: 4px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 결과 섹션 제목 스타일 개선 */
+.results-section h2 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-shadow: none;
 }
