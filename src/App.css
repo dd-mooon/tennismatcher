@@ -1,7 +1,7 @@
 /* 전체 앱 스타일 */
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -52,7 +52,7 @@ section h2 {
   color: #333;
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
-  border-bottom: 3px solid #667eea;
+  border-bottom: 3px solid #4a7c59;
   padding-bottom: 0.5rem;
 }
 
@@ -86,19 +86,19 @@ section h2 {
 
 .auto-setting {
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #4a7c59 0%, #5a8c69 100%);
   color: white;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: bold;
   text-align: center;
-  box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
-  border: 2px solid #1e7e34;
+  box-shadow: 0 3px 8px rgba(74, 124, 89, 0.3);
+  border: 2px solid #3a6b49;
 }
 
 .participant-count-selector select {
   padding: 1rem 2.5rem 1rem 1rem;
-  border: 2px solid #667eea;
+  border: 2px solid #4a7c59;
   border-radius: 8px;
   font-size: 1rem;
   background: white;
@@ -117,7 +117,7 @@ section h2 {
 
 .participant-count-selector select:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
 }
 
 .add-participant {
@@ -139,8 +139,8 @@ section h2 {
 
 .add-participant input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
 }
 
 .add-participant select {
@@ -162,7 +162,7 @@ section h2 {
 
 .add-participant button {
   padding: 0.8rem 1.5rem;
-  background: #667eea;
+  background: #4a7c59;
   color: white;
   border: none;
   border-radius: 8px;
@@ -172,7 +172,7 @@ section h2 {
 }
 
 .add-participant button:hover:not(:disabled) {
-  background: #5a6fd8;
+  background: #5a8c69;
   transform: translateY(-2px);
 }
 
@@ -200,7 +200,7 @@ section h2 {
 }
 
 .participant-item:hover {
-  border-color: #667eea;
+  border-color: #4a7c59;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -218,11 +218,11 @@ section h2 {
 }
 
 .gender-badge.male {
-  background: #4a90e2;
+  background: #2c5aa0;
 }
 
 .gender-badge.female {
-  background: #e24a90;
+  background: #a02c5a;
 }
 
 /* 성별 통계 스타일 */
@@ -237,13 +237,13 @@ section h2 {
 }
 
 .male-count {
-  color: #4a90e2;
+  color: #2c5aa0;
   font-weight: bold;
   font-size: 1rem;
 }
 
 .female-count {
-  color: #e24a90;
+  color: #a02c5a;
   font-weight: bold;
   font-size: 1rem;
 }
@@ -261,11 +261,11 @@ section h2 {
 }
 
 .type-badge.club {
-  background: #27ae60;
+  background: #4a7c59;
 }
 
 .type-badge.guest {
-  background: #f39c12;
+  background: #8b7355;
 }
 
 .participant-item .name {
@@ -276,7 +276,7 @@ section h2 {
 
 .participant-item button {
   padding: 0.5rem 1rem;
-  background: #ff4757;
+  background: #8b4513;
   color: white;
   border: none;
   border-radius: 6px;
@@ -286,7 +286,7 @@ section h2 {
 }
 
 .participant-item button:hover {
-  background: #ff3742;
+  background: #a0522d;
   transform: scale(1.05);
 }
 
@@ -296,11 +296,11 @@ section h2 {
   padding: 1.5rem;
   background: #e8f5e8;
   border-radius: 10px;
-  border: 2px solid #27ae60;
+  border: 2px solid #4a7c59;
 }
 
 .club-members-info h3 {
-  color: #27ae60;
+  color: #4a7c59;
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }
@@ -313,7 +313,7 @@ section h2 {
 
 .club-member-item {
   padding: 0.5rem 1rem;
-  background: #27ae60;
+  background: #4a7c59;
   color: white;
   border-radius: 20px;
   font-weight: 500;
@@ -344,7 +344,7 @@ section h2 {
 
 .toggle-btn {
   padding: 0.6rem 1.2rem;
-  background: #667eea;
+  background: #4a7c59;
   color: white;
   border: none;
   border-radius: 6px;
@@ -354,7 +354,7 @@ section h2 {
 }
 
 .toggle-btn:hover {
-  background: #5a6fd8;
+  background: #5a8c69;
   transform: translateY(-1px);
 }
 
@@ -395,8 +395,8 @@ section h2 {
 
 .add-club-member-form input:focus {
   outline: none;
-  border-color: #27ae60;
-  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
 }
 
 .add-club-member-form select {
@@ -418,7 +418,7 @@ section h2 {
 
 .add-club-member-form button {
   padding: 0.8rem 1.5rem;
-  background: #27ae60;
+  background: #4a7c59;
   color: white;
   border: none;
   border-radius: 8px;
@@ -428,7 +428,7 @@ section h2 {
 }
 
 .add-club-member-form button:hover {
-  background: #229954;
+  background: #5a8c69;
   transform: translateY(-2px);
 }
 
@@ -456,7 +456,7 @@ section h2 {
 }
 
 .saved-member-item:hover {
-  border-color: #27ae60;
+  border-color: #4a7c59;
   transform: translateY(-2px);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
@@ -469,7 +469,7 @@ section h2 {
 
 .add-btn {
   padding: 0.4rem 0.8rem;
-  background: #27ae60;
+  background: #4a7c59;
   color: white;
   border: none;
   border-radius: 4px;
@@ -479,7 +479,7 @@ section h2 {
 }
 
 .add-btn:hover:not(:disabled) {
-  background: #229954;
+  background: #5a8c69;
   transform: scale(1.05);
 }
 
@@ -490,7 +490,7 @@ section h2 {
 
 .remove-btn {
   padding: 0.4rem 0.8rem;
-  background: #e74c3c;
+  background: #8b4513;
   color: white;
   border: none;
   border-radius: 4px;
@@ -500,7 +500,7 @@ section h2 {
 }
 
 .remove-btn:hover {
-  background: #c0392b;
+  background: #a0522d;
   transform: scale(1.05);
 }
 
@@ -536,7 +536,7 @@ section h2 {
 }
 
 .manual-match-form h3 {
-  color: #667eea;
+  color: #4a7c59;
   margin-bottom: 1rem;
   font-size: 1.3rem;
 }
@@ -618,8 +618,8 @@ section h2 {
 
 .remove-manual-match {
   padding: 0.8rem 1.5rem;
-  background: #ff4757;
-  color: #000;
+  background: #8b4513;
+  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -629,7 +629,7 @@ section h2 {
 }
 
 .remove-manual-match:hover {
-  background: #ff3742;
+  background: #a0522d;
   transform: translateY(-2px);
 }
 
@@ -641,7 +641,7 @@ section h2 {
 
 .generate-btn {
   padding: 1.2rem 3rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4a7c59 0%, #5a8c69 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -649,12 +649,12 @@ section h2 {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 20px rgba(74, 124, 89, 0.3);
 }
 
 .generate-btn:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
 }
 
 .generate-btn:disabled {
@@ -673,7 +673,7 @@ section h2 {
 }
 
 .round-result h3 {
-  color: #667eea;
+  color: #4a7c59;
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
   text-align: center;
@@ -691,7 +691,7 @@ section h2 {
   padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #4a7c59;
 }
 
 .match h4 {
@@ -719,7 +719,7 @@ section h2 {
 
 .vs {
   font-weight: bold;
-  color: #667eea;
+  color: #4a7c59;
   font-size: 1.1rem;
 }
 
@@ -742,11 +742,11 @@ section h2 {
 
 .rest-player {
   padding: 0.6rem 1.2rem;
-  background: #ffeaa7;
+  background: #f0e68c;
   color: #2d3436;
   border-radius: 20px;
   font-weight: 500;
-  border: 2px solid #fdcb6e;
+  border: 2px solid #daa520;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -759,11 +759,11 @@ section h2 {
 }
 
 .rest-player-type.club {
-  color: #27ae60;
+  color: #4a7c59;
 }
 
 .rest-player-type.guest {
-  color: #e67e22;
+  color: #8b7355;
 }
 
 /* 매칭 결과 선수 정보 스타일 */
@@ -777,13 +777,13 @@ section h2 {
 
 /* 대표자 스타일 */
 .player-name.representative {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  background: linear-gradient(135deg, #daa520 0%, #ffd700 100%);
   color: #000;
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
   font-weight: bold;
-  border: 2px solid #ff6b35;
-  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+  border: 2px solid #b8860b;
+  box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
 }
 
 
@@ -827,33 +827,33 @@ section h2 {
 }
 
 .player-type.club {
-  color: #27ae60;
+  color: #4a7c59;
 }
 
 .player-type.guest {
-  color: #e67e22;
+  color: #8b7355;
 }
 
 .team-separator {
   margin: 0 0.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #4a7c59;
 }
 
 /* 코트 타입별 색깔 구분 */
 .match.male-court {
-  border-left: 4px solid #4a90e2;
-  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(74, 144, 226, 0.05) 100%);
+  border-left: 4px solid #2c5aa0;
+  background: linear-gradient(135deg, rgba(44, 90, 160, 0.1) 0%, rgba(44, 90, 160, 0.05) 100%);
 }
 
 .match.female-court {
-  border-left: 4px solid #e24a90;
-  background: linear-gradient(135deg, rgba(226, 74, 144, 0.1) 0%, rgba(226, 74, 144, 0.05) 100%);
+  border-left: 4px solid #a02c5a;
+  background: linear-gradient(135deg, rgba(160, 44, 90, 0.1) 0%, rgba(160, 44, 90, 0.05) 100%);
 }
 
 .match.mixed-court {
-  border-left: 4px solid #f39c12;
-  background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0.05) 100%);
+  border-left: 4px solid #8b7355;
+  background: linear-gradient(135deg, rgba(139, 115, 85, 0.1) 0%, rgba(139, 115, 85, 0.05) 100%);
 }
 
 .court-type-badge {
@@ -867,28 +867,28 @@ section h2 {
 }
 
 .male-court .court-type-badge {
-  background: #4a90e2;
+  background: #2c5aa0;
   color: white;
 }
 
 .female-court .court-type-badge {
-  background: #e24a90;
+  background: #a02c5a;
   color: white;
 }
 
 .mixed-court .court-type-badge {
-  background: #f39c12;
+  background: #8b7355;
   color: white;
 }
 
 /* 잡복 스타일 (어쩔 수 없는 경우) */
 .jabok-court {
-  border-left: 4px solid #e74c3c;
-  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+  border-left: 4px solid #8b4513;
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(139, 69, 19, 0.05) 100%);
 }
 
 .jabok-court .court-type-badge {
-  background: #e74c3c;
+  background: #8b4513;
   color: white;
 }
 
@@ -990,7 +990,7 @@ section h2 {
 .group-select {
   margin-left: 8px;
   padding: 4px 12px;
-  border: 2px solid #667eea;
+  border: 2px solid #4a7c59;
   border-radius: 6px;
   font-size: 12px;
   background: #f0f4ff;
@@ -1008,7 +1008,7 @@ section h2 {
 
 .group-select:hover {
   background: #e6efff;
-  border-color: #5a6fd8;
+  border-color: #5a8c69;
 }
 
 .guest-group-badge {
@@ -1025,19 +1025,19 @@ section h2 {
 
 .matching-stats {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 2px solid #667eea;
+  border: 2px solid #4a7c59;
   border-radius: 12px;
   padding: 25px;
   margin-bottom: 25px;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 25px rgba(74, 124, 89, 0.1);
 }
 
 .matching-stats h3 {
   margin: 0 0 20px 0;
-  color: #667eea;
+  color: #4a7c59;
   font-size: 1.4rem;
   text-align: center;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #4a7c59;
   padding-bottom: 10px;
 }
 
@@ -1060,7 +1060,7 @@ section h2 {
 }
 
 .stat-item:hover {
-  border-color: #667eea;
+  border-color: #4a7c59;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
@@ -1073,7 +1073,7 @@ section h2 {
 
 .stat-value {
   font-weight: bold;
-  color: #667eea;
+  color: #4a7c59;
   font-size: 1rem;
   font-family: 'Segoe UI', monospace;
 }
@@ -1089,12 +1089,12 @@ section h2 {
   padding: 18px;
   background: white;
   border-radius: 8px;
-  border: 2px solid #28a745;
-  box-shadow: 0 3px 8px rgba(40, 167, 69, 0.1);
+  border: 2px solid #4a7c59;
+  box-shadow: 0 3px 8px rgba(74, 124, 89, 0.1);
 }
 
 .type-breakdown .stat-value {
-  color: #28a745;
+  color: #4a7c59;
   font-family: 'Segoe UI', monospace;
   font-size: 1.1rem;
   letter-spacing: 0.5px;
@@ -1115,9 +1115,9 @@ section h2 {
 }
 
 .participant-item:hover {
-  border-color: #667eea;
+  border-color: #4a7c59;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.15);
 }
 
 .participant-item .name {
@@ -1129,7 +1129,7 @@ section h2 {
 
 /* 결과 섹션 제목 스타일 개선 */
 .results-section h2 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4a7c59 0%, #5a8c69 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
